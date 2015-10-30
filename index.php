@@ -8,7 +8,7 @@ $gi = geoip_open("GeoLiteCity.dat",GEOIP_STANDARD);
 // get server results from servers.minetest.ru
 $dom = new DOMDocument();  
 $dom->preserveWhiteSpace = false;   
-$html = $dom->loadHTMLFile('http://servers.minetest.ru/');  
+$html = $dom->loadHTMLFile('http://servers.minetest.net/');  
 $tables = $dom->getElementsByTagName('table');   
 $rows = $tables->item(0)->getElementsByTagName('tr');   
 $results = array();
@@ -25,18 +25,17 @@ foreach ($rows as $row) {
 $servers = array();
 foreach($results as $result) {
 	if (!$result) continue; 
-	list($host, $port) = explode(':',$result[1]);
+	list($host, $port) = explode(':',$result[0]);
 	$geoip = geoip_record_by_addr($gi,gethostbyname($host));
 	if (!$geoip) continue; 
 	$servers[] = array(
-		'name'=>$result[0],
+		'name'=>$result[3],
 		'host'=>$host,
 		'port'=>$port,
 		'lat'=>$geoip->latitude,
 		'lon'=>$geoip->longitude,
 		'site'=>$result[2],
-		'status'=>$result[3],
-		'uptime'=>$result[4],
+		'uptime'=>$result[6],
 	);
 }
 
@@ -71,7 +70,7 @@ foreach($results as $result) {
 					map: map
 				});
 				google.maps.event.addListener(marker_<?php echo $k; ?>, 'click', function() {
-					infowindow.setContent('<strong><a href="<?php echo $server['site']; ?>"><?php echo addslashes($server['name']); ?></a></strong><br/><?php echo $server['host']; ?>:<?php echo $server['port']; ?><br/><br/>Status: <?php echo $server['status']; ?> | Uptime: <?php echo $server['uptime']; ?>');
+					infowindow.setContent('<strong><a href="<?php echo $server['site']; ?>"><?php echo addslashes($server['name']); ?></a></strong><br/><?php echo $server['host']; ?>:<?php echo $server['port']; ?><br/><br/>Uptime: <?php echo $server['uptime']; ?>');
 					infowindow.open(map, marker_<?php echo $k; ?>);
 				});
 				<?php
